@@ -4,6 +4,8 @@ Chatbot AI yang **benar-benar mengingat** kamu lintas sesi — bukan cuma selama
 
 ## Fitur
 
+- 🌸 **Tema "Kuncup"** — identitas visual khas kuncup bunga yang belum mekar: hijau lumut sebagai badan, aksen blush pink mengintip di ujung, melambangkan hubungan yang "mekar" pelan-pelan seiring waktu
+
 - 💬 **Riwayat Chat Permanen** — semua percakapan tersimpan di database, tetap ada walau browser ditutup, app di-restart, atau diakses dari device lain
 - 🧠 **Memori Pintar** — AI otomatis mendeteksi & menyimpan fakta penting tentang kamu (nama, hobi, preferensi, dll) dari obrolan, lalu menggunakannya secara natural di percakapan berikutnya
 - 🗑️ **Kontrol Penuh** — bisa lihat semua yang "diingat" AI tentang kamu, dan edit atau hapus fakta tertentu (atau semuanya) kapan saja
