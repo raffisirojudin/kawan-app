@@ -6,7 +6,8 @@ Chatbot AI yang **benar-benar mengingat** kamu lintas sesi — bukan cuma selama
 
 - 💬 **Riwayat Chat Permanen** — semua percakapan tersimpan di database, tetap ada walau browser ditutup, app di-restart, atau diakses dari device lain
 - 🧠 **Memori Pintar** — AI otomatis mendeteksi & menyimpan fakta penting tentang kamu (nama, hobi, preferensi, dll) dari obrolan, lalu menggunakannya secara natural di percakapan berikutnya
-- 🗑️ **Kontrol Penuh** — bisa lihat semua yang "diingat" AI tentang kamu, dan hapus fakta tertentu atau semuanya kapan saja
+- 🗑️ **Kontrol Penuh** — bisa lihat semua yang "diingat" AI tentang kamu, dan edit atau hapus fakta tertentu (atau semuanya) kapan saja
+- 🎭 **Pilih Kepribadian Kawan** — atur gaya ngobrolnya: Santai, Formal, Jenaka, atau Suportif
 - 🔒 **Proteksi Password (sangat disarankan)** — karena app ini menyimpan data pribadi, aktifkan `APP_PASSWORD`
 - 👤 **Multi-identitas sederhana** — pakai field "Nama" untuk memisahkan riwayat tiap orang (bukan sistem login asli, lihat catatan di bawah)
 
