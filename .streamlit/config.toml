@@ -1,15 +1,15 @@
 [theme]
 base = "dark"
-primaryColor = "#7FAE8E"
-backgroundColor = "#1A1F1C"
-secondaryBackgroundColor = "#242B26"
-textColor = "#E8EDE7"
-borderColor = "#3A4339"
+primaryColor = "#D98A9E"
+backgroundColor = "#1B211C"
+secondaryBackgroundColor = "#26302A"
+textColor = "#EFE9E2"
+borderColor = "#3D4A3F"
 showWidgetBorder = true
 baseRadius = "small"
 font = "Nunito:https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
 headingFont = "Nunito:https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
 
 [theme.sidebar]
-backgroundColor = "#141813"
-secondaryBackgroundColor = "#242B26"
+backgroundColor = "#141A15"
+secondaryBackgroundColor = "#26302A"
