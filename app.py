@@ -95,10 +95,18 @@ def handle_gemini_error(e):
         st.error(f"Terjadi kesalahan: {e}")
 
 
-def build_chat_prompt(user_name, memories, recent_messages, new_message):
+PERSONALITY_PRESETS = {
+    "Santai": "Gunakan bahasa santai dan akrab, seperti ngobrol sama teman dekat. Boleh pakai bahasa sehari-hari yang wajar.",
+    "Formal": "Gunakan bahasa yang sopan, formal, dan terstruktur, seperti berbicara dengan orang yang dihormati.",
+    "Jenaka": "Gunakan nada jenaka, ringan, dan suka bercanda, tapi tetap perhatian dan nggak berlebihan.",
+    "Suportif": "Fokus jadi pendengar yang penuh empati dan suportif, validasi perasaan pengguna, dan beri semangat.",
+}
+
+
+def build_chat_prompt(user_name, memories, recent_messages, new_message, personality_instruction):
     memory_text = "\n".join(f"- {m['fact']}" for m in memories) if memories else "(belum ada catatan apapun)"
     system_instruction = (
-        f"Kamu adalah Kawan, teman ngobrol AI yang hangat, suportif, dan santai untuk {user_name}. "
+        f"Kamu adalah Kawan, teman ngobrol AI untuk {user_name}. {personality_instruction} "
         f"Berikut hal-hal yang sudah kamu ingat tentang {user_name} dari percakapan-percakapan sebelumnya:\n"
         f"{memory_text}\n\n"
         "Gunakan catatan ini secara natural kalau memang relevan dengan obrolan saat ini -- jangan "
@@ -169,6 +177,13 @@ def save_memory(user_id, fact):
         return None
 
 
+def update_memory(memory_id, new_fact):
+    try:
+        supabase.table("memories").update({"fact": new_fact}).eq("id", memory_id).execute()
+    except Exception as e:
+        handle_db_error(e)
+
+
 def delete_memory(memory_id):
     try:
         supabase.table("memories").delete().eq("id", memory_id).execute()
@@ -224,6 +239,12 @@ with st.sidebar:
     )
     st.caption("⚠️ Ini bukan login sungguhan. Untuk privasi penuh, aktifkan `APP_PASSWORD` di Secrets.")
 
+    st.divider()
+    st.header("🎭 Kepribadian")
+    personality_choice = st.selectbox(
+        "Gaya ngobrol Kawan", list(PERSONALITY_PRESETS.keys()), key="personality_choice"
+    )
+
     if user_name:
         if st.session_state.get("loaded_user_name") != user_name:
             st.session_state.chat_history = load_messages(user_name)
@@ -237,14 +258,36 @@ with st.sidebar:
             st.caption("Belum ada catatan. Ngobrol dulu, nanti otomatis terisi.")
         else:
             for mem in memories:
-                col_fact, col_del = st.columns([5, 1])
-                with col_fact:
-                    st.caption(f"• {mem['fact']}")
-                with col_del:
-                    if st.button("🗑️", key=f"del_mem_{mem['id']}", help="Lupakan fakta ini"):
-                        delete_memory(mem["id"])
-                        st.session_state.memories = [m for m in memories if m["id"] != mem["id"]]
-                        st.rerun()
+                is_editing = st.session_state.get(f"editing_{mem['id']}", False)
+
+                if is_editing:
+                    new_fact_text = st.text_input(
+                        "Edit fakta", value=mem["fact"], key=f"edit_input_{mem['id']}", label_visibility="collapsed"
+                    )
+                    col_save, col_cancel = st.columns(2)
+                    with col_save:
+                        if st.button("💾 Simpan", key=f"save_mem_{mem['id']}", use_container_width=True):
+                            update_memory(mem["id"], new_fact_text)
+                            mem["fact"] = new_fact_text
+                            st.session_state[f"editing_{mem['id']}"] = False
+                            st.rerun()
+                    with col_cancel:
+                        if st.button("Batal", key=f"cancel_mem_{mem['id']}", use_container_width=True):
+                            st.session_state[f"editing_{mem['id']}"] = False
+                            st.rerun()
+                else:
+                    col_fact, col_edit, col_del = st.columns([4, 1, 1])
+                    with col_fact:
+                        st.caption(f"• {mem['fact']}")
+                    with col_edit:
+                        if st.button("✏️", key=f"edit_btn_{mem['id']}", help="Edit fakta ini"):
+                            st.session_state[f"editing_{mem['id']}"] = True
+                            st.rerun()
+                    with col_del:
+                        if st.button("🗑️", key=f"del_mem_{mem['id']}", help="Lupakan fakta ini"):
+                            delete_memory(mem["id"])
+                            st.session_state.memories = [m for m in memories if m["id"] != mem["id"]]
+                            st.rerun()
 
         st.divider()
         st.header("⚠️ Zona Berbahaya")
@@ -281,7 +324,8 @@ if new_message:
         st.write(new_message)
 
     recent = st.session_state.chat_history[-RECENT_MESSAGES_LIMIT:-1]
-    prompt = build_chat_prompt(user_name, st.session_state.get("memories", []), recent, new_message)
+    personality_instruction = PERSONALITY_PRESETS[personality_choice]
+    prompt = build_chat_prompt(user_name, st.session_state.get("memories", []), recent, new_message, personality_instruction)
 
     try:
         with st.chat_message("assistant"):
