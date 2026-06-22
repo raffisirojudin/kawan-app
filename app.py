@@ -20,6 +20,16 @@ APP_VERSION = "v1.0"
 MODEL_NAME = "gemini-2.5-flash-lite"
 RECENT_MESSAGES_LIMIT = 20
 
+BUD_LOGO_SVG = """
+<svg width="52" height="68" viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 64 L24 26" stroke="#5C7A63" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M24 50 C14 48 8 40 10 32 C20 34 24 42 24 50 Z" fill="#4F6B55"/>
+  <path d="M24 44 C34 42 40 34 38 26 C28 28 24 36 24 44 Z" fill="#5C7A63"/>
+  <ellipse cx="24" cy="18" rx="11" ry="16" fill="#3F5645"/>
+  <path d="M24 4 C20 10 20 18 24 24 C28 18 28 10 24 4 Z" fill="#D98A9E" opacity="0.9"/>
+</svg>
+"""
+
 
 # ============================================================
 # SECRETS
@@ -208,14 +218,18 @@ def delete_all_memories(user_id):
 # ============================================================
 # HEADER
 # ============================================================
-st.title("🌱 Kawan")
-st.caption("Teman ngobrol AI yang nggak gampang lupa.")
+header_col1, header_col2 = st.columns([1, 6])
+with header_col1:
+    st.markdown(BUD_LOGO_SVG, unsafe_allow_html=True)
+with header_col2:
+    st.title("Kawan")
+    st.caption("Teman ngobrol AI yang nggak gampang lupa.")
 
 badge_col1, badge_col2, badge_col3 = st.columns(3)
 with badge_col1:
     st.badge("Memori Permanen", icon="🧠", color="green")
 with badge_col2:
-    st.badge("Gemini API", icon="✨", color="blue")
+    st.badge("Gemini API", icon="✨", color="violet")
 with badge_col3:
     st.badge(APP_VERSION, icon="🌱", color="gray")
 
