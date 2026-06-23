@@ -4,7 +4,7 @@ Chatbot AI yang **benar-benar mengingat** kamu lintas sesi — bukan cuma selama
 
 ## Fitur
 
-- 🌸 **Tema "Kuncup"** — identitas visual khas kuncup bunga yang belum mekar: hijau lumut sebagai badan, aksen blush pink mengintip di ujung, melambangkan hubungan yang "mekar" pelan-pelan seiring waktu
+- 🌸 **Tema "Kuncup" yang interaktif** — logo benar-benar berubah bentuk sesuai jumlah memori yang sudah Kawan simpan: kuncup rapat (0-2 memori) → mulai terbuka (3-7 memori) → mekar penuh jadi bunga (8+ memori). Bukan dekorasi statis, tapi representasi visual dari progres hubungan kamu sama Kawan
 
 - 💬 **Riwayat Chat Permanen** — semua percakapan tersimpan di database, tetap ada walau browser ditutup, app di-restart, atau diakses dari device lain
 - 🧠 **Memori Pintar** — AI otomatis mendeteksi & menyimpan fakta penting tentang kamu (nama, hobi, preferensi, dll) dari obrolan, lalu menggunakannya secara natural di percakapan berikutnya
