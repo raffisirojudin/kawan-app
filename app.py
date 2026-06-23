@@ -20,7 +20,7 @@ APP_VERSION = "v1.0"
 MODEL_NAME = "gemini-2.5-flash-lite"
 RECENT_MESSAGES_LIMIT = 20
 
-BUD_LOGO_SVG = """
+BUD_LOGO_CLOSED = """
 <svg width="52" height="68" viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg">
   <path d="M24 64 L24 26" stroke="#5C7A63" stroke-width="3" stroke-linecap="round" fill="none"/>
   <path d="M24 50 C14 48 8 40 10 32 C20 34 24 42 24 50 Z" fill="#4F6B55"/>
@@ -29,6 +29,56 @@ BUD_LOGO_SVG = """
   <path d="M24 4 C20 10 20 18 24 24 C28 18 28 10 24 4 Z" fill="#D98A9E" opacity="0.9"/>
 </svg>
 """
+
+BUD_LOGO_OPENING = """
+<svg width="52" height="68" viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 64 L24 28" stroke="#5C7A63" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M24 50 C14 48 8 40 10 32 C20 34 24 42 24 50 Z" fill="#4F6B55"/>
+  <path d="M24 44 C34 42 40 34 38 26 C28 28 24 36 24 44 Z" fill="#5C7A63"/>
+  <path d="M16 22 C13 14 17 8 24 8 C21 14 18 20 16 22 Z" fill="#3F5645"/>
+  <path d="M32 22 C35 14 31 8 24 8 C27 14 30 20 32 22 Z" fill="#3F5645"/>
+  <ellipse cx="24" cy="13" rx="6" ry="10" fill="#D98A9E"/>
+  <ellipse cx="17" cy="17" rx="5" ry="8" fill="#E0899F" opacity="0.9" transform="rotate(-22 17 17)"/>
+  <ellipse cx="31" cy="17" rx="5" ry="8" fill="#E0899F" opacity="0.9" transform="rotate(22 31 17)"/>
+</svg>
+"""
+
+BUD_LOGO_BLOOM = """
+<svg width="52" height="68" viewBox="0 0 48 64" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 64 L24 32" stroke="#5C7A63" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M24 50 C14 48 8 40 10 32 C20 34 24 42 24 50 Z" fill="#4F6B55"/>
+  <path d="M24 44 C34 42 40 34 38 26 C28 28 24 36 24 44 Z" fill="#5C7A63"/>
+  <g>
+    <ellipse cx="24" cy="8" rx="6" ry="9" fill="#E0899F" transform="rotate(0 24 17)"/>
+    <ellipse cx="24" cy="8" rx="6" ry="9" fill="#E0899F" transform="rotate(72 24 17)"/>
+    <ellipse cx="24" cy="8" rx="6" ry="9" fill="#E0899F" transform="rotate(144 24 17)"/>
+    <ellipse cx="24" cy="8" rx="6" ry="9" fill="#E0899F" transform="rotate(216 24 17)"/>
+    <ellipse cx="24" cy="8" rx="6" ry="9" fill="#E0899F" transform="rotate(288 24 17)"/>
+  </g>
+  <circle cx="24" cy="17" r="4" fill="#F2C94C"/>
+</svg>
+"""
+
+BLOOM_STAGE_2_THRESHOLD = 3
+BLOOM_STAGE_3_THRESHOLD = 8
+
+
+def get_bud_logo(memory_count):
+    if memory_count >= BLOOM_STAGE_3_THRESHOLD:
+        return BUD_LOGO_BLOOM
+    elif memory_count >= BLOOM_STAGE_2_THRESHOLD:
+        return BUD_LOGO_OPENING
+    return BUD_LOGO_CLOSED
+
+
+def get_bud_stage_label(memory_count):
+    if memory_count >= BLOOM_STAGE_3_THRESHOLD:
+        return "🌸 Sudah mekar penuh."
+    elif memory_count >= BLOOM_STAGE_2_THRESHOLD:
+        remaining = BLOOM_STAGE_3_THRESHOLD - memory_count
+        return f"🌷 Mulai terbuka -- {remaining} memori lagi sampai mekar penuh."
+    remaining = BLOOM_STAGE_2_THRESHOLD - memory_count
+    return f"🌱 Masih kuncup rapat -- {remaining} memori lagi sampai mulai terbuka."
 
 
 # ============================================================
@@ -216,28 +266,7 @@ def delete_all_memories(user_id):
 
 
 # ============================================================
-# HEADER
-# ============================================================
-header_col1, header_col2 = st.columns([1, 6])
-with header_col1:
-    st.markdown(BUD_LOGO_SVG, unsafe_allow_html=True)
-with header_col2:
-    st.title("Kawan")
-    st.caption("Teman ngobrol AI yang nggak gampang lupa.")
-
-badge_col1, badge_col2, badge_col3 = st.columns(3)
-with badge_col1:
-    st.badge("Memori Permanen", icon="🧠", color="green")
-with badge_col2:
-    st.badge("Gemini API", icon="✨", color="violet")
-with badge_col3:
-    st.badge(APP_VERSION, icon="🌱", color="gray")
-
-st.divider()
-
-
-# ============================================================
-# SIDEBAR: IDENTITAS & MANAJEMEN MEMORI
+# SIDEBAR (bagian 1): IDENTITAS -- dimuat dulu sebelum header
 # ============================================================
 with st.sidebar:
     st.markdown("### 🌱 Kawan")
@@ -253,6 +282,43 @@ with st.sidebar:
     )
     st.caption("⚠️ Ini bukan login sungguhan. Untuk privasi penuh, aktifkan `APP_PASSWORD` di Secrets.")
 
+if user_name:
+    if st.session_state.get("loaded_user_name") != user_name:
+        st.session_state.chat_history = load_messages(user_name)
+        st.session_state.memories = load_memories(user_name)
+        st.session_state.loaded_user_name = user_name
+
+memory_count = len(st.session_state.get("memories", [])) if user_name else 0
+
+
+# ============================================================
+# HEADER -- logo kuncup berubah sesuai jumlah memori
+# ============================================================
+header_col1, header_col2 = st.columns([1, 6])
+with header_col1:
+    st.markdown(get_bud_logo(memory_count), unsafe_allow_html=True)
+with header_col2:
+    st.title("Kawan")
+    if user_name:
+        st.caption(get_bud_stage_label(memory_count))
+    else:
+        st.caption("Teman ngobrol AI yang nggak gampang lupa.")
+
+badge_col1, badge_col2, badge_col3 = st.columns(3)
+with badge_col1:
+    st.badge("Memori Permanen", icon="🧠", color="green")
+with badge_col2:
+    st.badge("Gemini API", icon="✨", color="violet")
+with badge_col3:
+    st.badge(APP_VERSION, icon="🌱", color="gray")
+
+st.divider()
+
+
+# ============================================================
+# SIDEBAR (bagian 2): KEPRIBADIAN & MANAJEMEN MEMORI
+# ============================================================
+with st.sidebar:
     st.divider()
     st.header("🎭 Kepribadian")
     personality_choice = st.selectbox(
@@ -260,13 +326,8 @@ with st.sidebar:
     )
 
     if user_name:
-        if st.session_state.get("loaded_user_name") != user_name:
-            st.session_state.chat_history = load_messages(user_name)
-            st.session_state.memories = load_memories(user_name)
-            st.session_state.loaded_user_name = user_name
-
         st.divider()
-        st.header("🧠 Yang aku ingat")
+        st.header(f"🧠 Yang aku ingat ({memory_count})")
         memories = st.session_state.get("memories", [])
         if not memories:
             st.caption("Belum ada catatan. Ngobrol dulu, nanti otomatis terisi.")
